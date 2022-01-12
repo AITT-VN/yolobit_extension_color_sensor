@@ -1,2 +1,1 @@
-# yolobit_extension_color_sensor
-Mục mở rộng YoloBit để làm việc với cảm biến màu sắc tcs34725
+Yolo:Bit extension for Color Sensor TCS34725
