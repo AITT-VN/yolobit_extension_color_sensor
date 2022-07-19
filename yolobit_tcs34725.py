@@ -1,7 +1,6 @@
 import machine, time, ustruct
 from micropython import const
-from machine import Pin
-from machine import I2C
+from machine import SoftI2C, Pin
 
 #const = lambda x:x
 
@@ -199,7 +198,7 @@ class ColorSensor:
         try:
             self.tcs = TCS34725(machine.SoftI2C(scl=scl_pin, sda=sda_pin), self.address)
         except:
-            say('Color sensor not found')
+            print('Color sensor not found')
             raise Exception('Color sensor not found')
 
     def read(self, color):
