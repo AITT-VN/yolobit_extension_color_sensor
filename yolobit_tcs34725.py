@@ -191,15 +191,21 @@ class TCS34725:
 
 class ColorSensor:
     
-    def __init__(self, address = 0x29):
+    def __init__(self, address = 0x29, color_sensor_status = 0):
         self.address = address
+        self.color_sensor_status =  color_sensor_status
         scl_pin = machine.Pin(22)
         sda_pin = machine.Pin(21)
         try:
             self.tcs = TCS34725(machine.SoftI2C(scl=scl_pin, sda=sda_pin), self.address)
         except:
             print('Color sensor not found')
-            raise Exception('Color sensor not found')
+            self.color_sensor_status = 0 
+            #raise Exception('Color sensor not found')
+        else:
+            self.color_sensor_status = 1
+            print(self.color_sensor_status)
+            print('Founded color sensor !')
 
     def read(self, color):
         '''
@@ -207,7 +213,10 @@ class ColorSensor:
         color_sensor.read(0, 'r')
         range of value return: 0 - 255 (type int)
         '''
-        return self.tcs.html_rgb()[COLOR[color]]
+        if self.color_sensor_status == 1 :
+            return self.tcs.html_rgb()[COLOR[color]]
+        else:
+            return self.color_sensor_status
 
     def detect(self, color, limit = 40):
         '''
@@ -220,27 +229,30 @@ class ColorSensor:
                 white(16, 16, 16)
                 yellow (30, 15, 4)
         '''
-        r, g, b = self.tcs.html_rgb()
-        if max(r, g, b, limit) == r:
+        if self.color_sensor_status == 1:
+            r, g, b = self.tcs.html_rgb()
+            if max(r, g, b, limit) == r:
             #red
-            return 0 == COLOR[color]
-        elif max(r, g, b, limit) == g:
+                return 0 == COLOR[color]
+            elif max(r, g, b, limit) == g:
             #green
-            return 1 == COLOR[color]
-        elif max(r, g, b, limit) == b:
+                return 1 == COLOR[color]
+            elif max(r, g, b, limit) == b:
             #blue
-            return 2 == COLOR[color]
-        elif max(r, g, b) < (limit/3):
+                return 2 == COLOR[color]
+            elif max(r, g, b) < (limit/3):
             #black
-            return 3 == COLOR[color]
-        elif min(r, g, b) > (limit/3):
+                return 3 == COLOR[color]
+            elif min(r, g, b) > (limit/3):
             #white
-            return 4 == COLOR[color]
-        elif ((26 < r < 36) and (14 < g < 24) and (0 < b < 8)):
+                return 4 == COLOR[color]
+            elif ((26 < r < 36) and (14 < g < 24) and (0 < b < 8)):
             #yellow
-            return 5 == COLOR[color]
-        else:
+                return 5 == COLOR[color]
+            else:
             #other colors
+                return False
+        else:
             return False
 
 color_sensor = ColorSensor()
